@@ -1,0 +1,115 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+    Node(int val) : data(val), left(nullptr), right(nullptr) {}
+};
+
+class BST {
+public:
+    BST() : root(nullptr) {}
+
+    void insert(int val) {
+        root = insert(root, val);
+    }
+
+    bool search(int val) {
+        return search(root, val);
+    }
+
+    void deleteValue(int val) {
+        root = deleteNode(root, val);
+    }
+
+    void inorder() {
+        inorder(root);
+        cout << endl;
+    }
+
+private:
+    Node* root;
+
+    Node* insert(Node* node, int val) {
+        if (!node) return new Node(val);
+        if (val < node->data) node->left = insert(node->left, val);
+        else if (val > node->data) node->right = insert(node->right, val);
+        return node;
+    }
+
+    bool search(Node* node, int val) {
+        if (!node) return false;
+        if (node->data == val) return true;
+        if (val < node->data) return search(node->left, val);
+        return search(node->right, val);
+    }
+
+    Node* deleteNode(Node* node, int val) {
+        if (!node) return nullptr;
+        if (val < node->data) node->left = deleteNode(node->left, val);
+        else if (val > node->data) node->right = deleteNode(node->right, val);
+        else {
+            if (!node->left) {
+                Node* temp = node->right;
+                delete node;
+                return temp;
+            } else if (!node->right) {
+                Node* temp = node->left;
+                delete node;
+                return temp;
+            }
+            Node* temp = minValueNode(node->right);
+            node->data = temp->data;
+            node->right = deleteNode(node->right, temp->data);
+        }
+        return node;
+    }
+
+    Node* minValueNode(Node* node) {
+        Node* current = node;
+        while (current && current->left != nullptr)
+            current = current->left;
+        return current;
+    }
+
+    void inorder(Node* node) {
+        if (node) {
+            inorder(node->left);
+            cout << node->data << " ";
+            inorder(node->right);
+        }
+    }
+};
+
+int main() {
+    BST tree;
+    tree.insert(50);
+    tree.insert(30);
+    tree.insert(70);
+    tree.insert(20);
+    tree.insert(40);
+    tree.insert(60);
+    tree.insert(80);
+
+    cout << "Inorder traversal: ";
+    tree.inorder();
+
+    cout << "Search 40: " << (tree.search(40) ? "Found" : "Not Found") << endl;
+    cout << "Search 90: " << (tree.search(90) ? "Found" : "Not Found") << endl;
+
+    tree.deleteValue(20);
+    cout << "Inorder traversal after deleting 20: ";
+    tree.inorder();
+
+    tree.deleteValue(30);
+    cout << "Inorder traversal after deleting 30: ";
+    tree.inorder();
+
+    tree.deleteValue(50);
+    cout << "Inorder traversal after deleting 50: ";
+    tree.inorder();
+
+    return 0;
+}
